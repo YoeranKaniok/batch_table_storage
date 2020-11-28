@@ -12,6 +12,9 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/YoeranKaniok/table_storage_batch",
+    install_requires=[
+       'azure-cosmosdb-table==1.0.6'
+    ],
     packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",

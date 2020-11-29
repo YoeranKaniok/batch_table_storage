@@ -1,6 +1,5 @@
+import asyncio
 from collections import defaultdict
-
-from aioify import aioify
 from azure.cosmosdb.table.tableservice import TableService
 
 from batch_table_service._batch_table import CustomTableBatch
@@ -302,7 +301,7 @@ class BatchTableService(TableService):
 
         kwargs = dict(if_match=if_match) if if_match else dict()
 
-        results = []
+        routines = []
         for values in batch_objects.values():
             for object_list in list(_chunks(values, 100)):
                 batch = CustomTableBatch(require_encryption=require_encryption, key_encryption_key=key_encryption_key,
@@ -310,10 +309,11 @@ class BatchTableService(TableService):
                 for obj in object_list:
                     batch_function(self=batch, entity=obj, **kwargs)
 
-                results.extend(await self._async_commit_batch(table_name=table_name, batch=batch, timeout=timeout))
-        return results
+                routines.append(self._async_commit_batch(table_name=table_name, batch=batch, timeout=timeout))
 
-    @aioify
+        results = await asyncio.gather(*routines)
+        return [res for sublist in results for res in sublist]
+
     async def _async_commit_batch(self, table_name, batch, timeout):
         return self.commit_batch(table_name=table_name, batch=batch, timeout=timeout)
 

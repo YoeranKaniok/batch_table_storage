@@ -1,3 +1,3 @@
-from ._batch_table import BatchTableService
+from ._table_service import BatchTableService
 
 __all__ = ['BatchTableService']

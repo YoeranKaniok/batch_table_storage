@@ -1,22 +1,23 @@
 Microsoft Azure CosmosDB Table SDK for Python with batching functionality
 =========================================================================
 
-This project provides a wrapper for the Azure cosmosdb TableService. 
-For documentation on this package please see the `Microsoft Azure CosmosDB Table SDK for Python`_ page.
+This project provides a wrapper for the Azure cosmosdb TableService.
+The wrapper lets you insert/merge/replace lists of entities.
+You can give it any number of PartitionKeys, they will be processed in different batches.
+ 
+For documentation on the base package please see `azure-cosmosdb-table` package. (https://pypi.org/project/azure-cosmosdb-table/)
 
 Features
 ========
 
--  Table
-
-   -  Automatically split lists of entities into batches based on PartitionKey
-   -  Automatically chunk entities into sub-lists for correct batch sizes
-   -  Batch Insert Entities
-   -  Batch Update Entities
-   -  Batch Merge Entities
-   -  Batch Delete Entities
-   -  Batch Insert or Replace Entities
-   -  Batch Insert or Merge Entities
+-  Automatically split lists of entities into batches based on PartitionKey
+-  Automatically chunk entities into sub-lists for correct batch sizes
+-  Batch Insert Entities
+-  Batch Update Entities
+-  Batch Merge Entities
+-  Batch Delete Entities
+-  Batch Insert or Replace Entities
+-  Batch Insert or Merge Entities
    
 Getting Started
 ===============
@@ -57,4 +58,4 @@ Create and commit the batches:
 
 Learn More
 ==========
-.. _Microsoft Azure CosmosDB Table SDK for Python: https://pypi.org/project/azure-cosmosdb-table/
+Microsoft Azure CosmosDB Table SDK for Python: https://pypi.org/project/azure-cosmosdb-table/

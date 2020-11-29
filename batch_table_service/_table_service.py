@@ -1,6 +1,8 @@
+from aioify import aioify
 from azure.cosmosdb.table.tableservice import TableService
 
 from batch_table_service._batch_table import CustomTableBatch
+from collections import defaultdict
 
 
 class BatchTableService(TableService):
@@ -41,7 +43,7 @@ class BatchTableService(TableService):
         parameters for encryption/decryption must be provided. See the above comments on the key_encryption_key and resolver.
     """
 
-    def batch_insert_entities(self, table_name, entities, require_encryption=False, key_encryption_key=None,
+    async def batch_insert_entities(self, table_name, entities, require_encryption=False, key_encryption_key=None,
                               encryption_resolver=None, timeout=None):
         """
         Creates and commits batches. All entities will be inserted
@@ -69,7 +71,7 @@ class BatchTableService(TableService):
             The items could either be an etag, in case of success, or an error object in case of failure.
         :rtype: list(:class:`~azure.storage.table.models.AzureBatchOperationError`, str)
         """
-        return self._handle_batch(
+        return await self._handle_batch(
             table_name=table_name,
             entities=entities,
             batch_function=CustomTableBatch.insert_entity,
@@ -79,7 +81,7 @@ class BatchTableService(TableService):
             timeout=timeout,
         )
 
-    def batch_update_entities(self, table_name, entities, require_encryption=False, key_encryption_key=None,
+    async def batch_update_entities(self, table_name, entities, require_encryption=False, key_encryption_key=None,
                               encryption_resolver=None, timeout=None, if_match='*'):
         """
         Creates and commits batches. All entities will be updated
@@ -115,7 +117,7 @@ class BatchTableService(TableService):
             The items could either be an etag, in case of success, or an error object in case of failure.
         :rtype: list(:class:`~azure.storage.table.models.AzureBatchOperationError`, str)
         """
-        return self._handle_batch(
+        return await self._handle_batch(
             table_name=table_name,
             entities=entities,
             batch_function=CustomTableBatch.update_entity,
@@ -126,7 +128,7 @@ class BatchTableService(TableService):
             if_match=if_match
         )
 
-    def batch_merge_entities(self, table_name, entities, require_encryption=False, key_encryption_key=None,
+    async def batch_merge_entities(self, table_name, entities, require_encryption=False, key_encryption_key=None,
                              encryption_resolver=None, timeout=None, if_match='*'):
         """
         Creates and commits batches. All entities will be merged
@@ -162,7 +164,7 @@ class BatchTableService(TableService):
             The items could either be an etag, in case of success, or an error object in case of failure.
         :rtype: list(:class:`~azure.storage.table.models.AzureBatchOperationError`, str)
         """
-        return self._handle_batch(
+        return await self._handle_batch(
             table_name=table_name,
             entities=entities,
             batch_function=CustomTableBatch.merge_entity,
@@ -173,13 +175,15 @@ class BatchTableService(TableService):
             if_match=if_match
         )
 
-    def batch_delete_entities(self, table_name, entities, require_encryption=False, key_encryption_key=None,
+    async def batch_delete_entities(self, table_name, entities, require_encryption=False, key_encryption_key=None,
                               encryption_resolver=None, timeout=None, if_match='*'):
         """
         Delete a list of entities in batch
         :func:`~azure.storage.table.tableservice.TableService.delete_entity` for more
         information on deletes.
 
+        :param str table_name:
+            The name of the table used in the operations.
         :param entities:
             The entities to be inserted or replaced.
         :type entities: list of dict or :class:`~azure.storage.table.models.Entity`
@@ -202,7 +206,7 @@ class BatchTableService(TableService):
             not been modified since it was retrieved by the client. To force
             an unconditional update, set If-Match to the wildcard character (*).
         """
-        return self._handle_batch(
+        return await self._handle_batch(
             table_name=table_name,
             entities=entities,
             batch_function=CustomTableBatch.delete,
@@ -212,7 +216,7 @@ class BatchTableService(TableService):
             timeout=timeout
         )
 
-    def batch_insert_or_replace_entities(self, table_name, entities, require_encryption=False, key_encryption_key=None,
+    async def batch_insert_or_replace_entities(self, table_name, entities, require_encryption=False, key_encryption_key=None,
                                          encryption_resolver=None, timeout=None):
         """
         Creates and commits batches. All entities will be inserted or replaced
@@ -240,7 +244,7 @@ class BatchTableService(TableService):
             The items could either be an etag, in case of success, or an error object in case of failure.
         :rtype: list(:class:`~azure.storage.table.models.AzureBatchOperationError`, str)
         """
-        return self._handle_batch(
+        return await self._handle_batch(
             table_name=table_name,
             entities=entities,
             batch_function=CustomTableBatch.insert_or_replace_entity,
@@ -250,7 +254,7 @@ class BatchTableService(TableService):
             timeout=timeout
         )
 
-    def batch_insert_or_merge_entities(self, table_name, entities, require_encryption=False, key_encryption_key=None,
+    async def batch_insert_or_merge_entities(self, table_name, entities, require_encryption=False, key_encryption_key=None,
                                        encryption_resolver=None, timeout=None):
         """
         Creates and commits batches. All entities will be inserted or merged
@@ -278,7 +282,7 @@ class BatchTableService(TableService):
             The items could either be an etag, in case of success, or an error object in case of failure.
         :rtype: list(:class:`~azure.storage.table.models.AzureBatchOperationError`, str)
         """
-        return self._handle_batch(
+        return await self._handle_batch(
             table_name=table_name,
             entities=entities,
             batch_function=CustomTableBatch.insert_or_merge_entity,
@@ -288,32 +292,32 @@ class BatchTableService(TableService):
             timeout=timeout
         )
 
-    def _handle_batch(self, table_name, entities, batch_function, require_encryption=False, key_encryption_key=None,
+    async def _handle_batch(self, table_name, entities, batch_function, require_encryption=False, key_encryption_key=None,
                       encryption_resolver=None, timeout=None, if_match=None):
         # Sort objects into batches, each batch needs the same "PartitionKey"
-        batch_objects = dict()
-        for obj in entities:
-            batch_objects.setdefault(obj['PartitionKey'], []).append(obj)
+        batch_objects = defaultdict(list)
+        for entity in entities:
+            batch_objects[entity['PartitionKey']].append(entity)
 
-        kwargs = dict()
-        if if_match:
-            kwargs.setdefault('if_match', if_match)
+        kwargs = dict(if_match=if_match) if if_match else dict()
+
         results = []
-        # create batches for every partitionkey
         for values in batch_objects.values():
-            # chunk per 100, max batch size
             for object_list in list(_chunks(values, 100)):
                 batch = CustomTableBatch(require_encryption=require_encryption, key_encryption_key=key_encryption_key,
                                          encryption_resolver=encryption_resolver)
-                # fill batch with objects
                 for obj in object_list:
                     batch_function(self=batch, entity=obj, **kwargs)
 
-                results.extend(self.commit_batch(table_name=table_name, batch=batch, timeout=timeout))
+                results.extend(await self._async_commit_batch(table_name=table_name, batch=batch, timeout=timeout))
         return results
 
+    @aioify
+    async def _async_commit_batch(self, table_name, batch, timeout):
+        return self.commit_batch(table_name=table_name, batch=batch, timeout=timeout)
 
-def _chunks(l, n):
-    """Yield successive n-sized chunks from l."""
-    for i in range(0, len(l), n):
-        yield l[i:i + n]
+
+def _chunks(item_list: list, size: int):
+    """Yield successive size-sized chunks from item_list."""
+    for i in range(0, len(item_list), size):
+        yield item_list[i:i + size]

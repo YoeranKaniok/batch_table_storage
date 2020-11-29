@@ -1,3 +1,4 @@
-setuptools
-wheel
+aioify==0.3.2
+azure-common==1.1.26
+azure-cosmosdb-nspkg==2.0.2
 azure-cosmosdb-table==1.0.6

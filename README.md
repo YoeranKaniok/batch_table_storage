@@ -1,8 +1,8 @@
-Microsoft Azure CosmosDB Table SDK for Python with batching functionality
+Async Microsoft Azure CosmosDB Table SDK for Python with batching functionality
 =========================================================================
 
-This project provides a wrapper for the Azure cosmosdb TableService.
-The wrapper lets you insert/merge/replace lists of entities.
+This project provides a asynchronous wrapper for the Azure cosmosdb TableService.
+The wrapper lets you insert/merge/replace/delete lists of entities using `aioify`.
 You can give it any number of PartitionKeys, they will be processed in different batches.
  
 For documentation on the base package please see `azure-cosmosdb-table` package. (https://pypi.org/project/azure-cosmosdb-table/)
@@ -12,12 +12,12 @@ Features
 
 -  Automatically split lists of entities into batches based on PartitionKey
 -  Automatically chunk entities into sub-lists for correct batch sizes
--  Batch Insert Entities
--  Batch Update Entities
--  Batch Merge Entities
--  Batch Delete Entities
--  Batch Insert or Replace Entities
--  Batch Insert or Merge Entities
+-  Batch Insert Entities async
+-  Batch Update Entities async
+-  Batch Merge Entities async
+-  Batch Delete Entities async
+-  Batch Insert or Replace Entities async
+-  Batch Insert or Merge Entities async
    
 Getting Started
 ===============
@@ -51,9 +51,15 @@ Create some entities
         {'PartitionKey': 'pet', 'RowKey': '1', 'name': 'Cat'}
     ]
 
-Create and commit the batches:
+Import asyncio:
    
-    service.batch_insert_entities(table_name='tableA', entities=entities)
+    import asyncio
+
+Create and commit the batches async:
+   
+    asyncio.run(
+        service.batch_insert_entities(table_name='tableA', entities=entities)
+    )
 
 
 Learn More

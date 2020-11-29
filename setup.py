@@ -8,12 +8,13 @@ setuptools.setup(
     version="0.0.7",
     author="Yoeran Kaniok",
     author_email="yoeran@live.nl",
-    description="Batch functionality for Azure Table Storage",
+    description="Async batch functionality for Azure Table Storage",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/YoeranKaniok/batch_table_storage",
     install_requires=[
-       'azure-cosmosdb-table==1.0.6'
+        'azure-cosmosdb-table==1.0.6',
+        'aioify==0.3.2'
     ],
     packages=setuptools.find_packages(),
     classifiers=[

@@ -250,8 +250,8 @@ class BatchTableService(TableService):
             timeout=timeout
         )
 
-    def batch_insert_or_merge(self, table_name, entities, require_encryption=False, key_encryption_key=None,
-                              encryption_resolver=None, timeout=None):
+    def batch_insert_or_merge_entities(self, table_name, entities, require_encryption=False, key_encryption_key=None,
+                                       encryption_resolver=None, timeout=None):
         """
         Creates and commits batches. All entities will be inserted or merged
         Uses update entity operation in batch. See

@@ -5,7 +5,7 @@ with open("README.md", "r") as rm:
 
 setuptools.setup(
     name="batch_table_storage",
-    version="0.0.5",
+    version="0.0.6",
     author="Yoeran Kaniok",
     author_email="yoeran@live.nl",
     description="Batch functionality for Azure Table Storage",

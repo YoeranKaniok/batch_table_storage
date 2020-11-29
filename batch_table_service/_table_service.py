@@ -1,8 +1,9 @@
+from collections import defaultdict
+
 from aioify import aioify
 from azure.cosmosdb.table.tableservice import TableService
 
 from batch_table_service._batch_table import CustomTableBatch
-from collections import defaultdict
 
 
 class BatchTableService(TableService):
@@ -44,7 +45,7 @@ class BatchTableService(TableService):
     """
 
     async def batch_insert_entities(self, table_name, entities, require_encryption=False, key_encryption_key=None,
-                              encryption_resolver=None, timeout=None):
+                                    encryption_resolver=None, timeout=None):
         """
         Creates and commits batches. All entities will be inserted
         Users insert entity operation in batch. See
@@ -82,7 +83,7 @@ class BatchTableService(TableService):
         )
 
     async def batch_update_entities(self, table_name, entities, require_encryption=False, key_encryption_key=None,
-                              encryption_resolver=None, timeout=None, if_match='*'):
+                                    encryption_resolver=None, timeout=None, if_match='*'):
         """
         Creates and commits batches. All entities will be updated
         Uses update entity operation in batch. See
@@ -129,7 +130,7 @@ class BatchTableService(TableService):
         )
 
     async def batch_merge_entities(self, table_name, entities, require_encryption=False, key_encryption_key=None,
-                             encryption_resolver=None, timeout=None, if_match='*'):
+                                   encryption_resolver=None, timeout=None, if_match='*'):
         """
         Creates and commits batches. All entities will be merged
         Uses update entity operation in batch. See
@@ -176,7 +177,7 @@ class BatchTableService(TableService):
         )
 
     async def batch_delete_entities(self, table_name, entities, require_encryption=False, key_encryption_key=None,
-                              encryption_resolver=None, timeout=None, if_match='*'):
+                                    encryption_resolver=None, timeout=None, if_match='*'):
         """
         Delete a list of entities in batch
         :func:`~azure.storage.table.tableservice.TableService.delete_entity` for more
@@ -216,8 +217,8 @@ class BatchTableService(TableService):
             timeout=timeout
         )
 
-    async def batch_insert_or_replace_entities(self, table_name, entities, require_encryption=False, key_encryption_key=None,
-                                         encryption_resolver=None, timeout=None):
+    async def batch_insert_or_replace_entities(self, table_name, entities, require_encryption=False,
+                                               key_encryption_key=None, encryption_resolver=None, timeout=None):
         """
         Creates and commits batches. All entities will be inserted or replaced
         Uses update entity operation in batch. See
@@ -254,8 +255,8 @@ class BatchTableService(TableService):
             timeout=timeout
         )
 
-    async def batch_insert_or_merge_entities(self, table_name, entities, require_encryption=False, key_encryption_key=None,
-                                       encryption_resolver=None, timeout=None):
+    async def batch_insert_or_merge_entities(self, table_name, entities, require_encryption=False,
+                                             key_encryption_key=None, encryption_resolver=None, timeout=None):
         """
         Creates and commits batches. All entities will be inserted or merged
         Uses update entity operation in batch. See
@@ -292,8 +293,8 @@ class BatchTableService(TableService):
             timeout=timeout
         )
 
-    async def _handle_batch(self, table_name, entities, batch_function, require_encryption=False, key_encryption_key=None,
-                      encryption_resolver=None, timeout=None, if_match=None):
+    async def _handle_batch(self, table_name, entities, batch_function, require_encryption=False,
+                            key_encryption_key=None, encryption_resolver=None, timeout=None, if_match=None):
         # Sort objects into batches, each batch needs the same "PartitionKey"
         batch_objects = defaultdict(list)
         for entity in entities:
